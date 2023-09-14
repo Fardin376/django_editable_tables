@@ -1,0 +1,1 @@
+# django_editable_tables
