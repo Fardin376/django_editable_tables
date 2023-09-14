@@ -1,4 +1,4 @@
-# django_editable_tables
+# Django_Editable_Tables
 
 This site is a demo of how **Django Models** can be used to import large **CSV** files into a database and how the data can be fetched to a table which contains **edit** and **save** buttons 
 
