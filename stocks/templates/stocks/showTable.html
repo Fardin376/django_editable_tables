@@ -1,0 +1,106 @@
+{% extends 'stocks/home.html' %}
+
+{% block title %}
+All Data
+{% endblock title %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>All Data</h1>
+            <table id="editableTable" class="table table-striped">
+                {% csrf_token %}
+                <thead>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Trade Code</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Open</th>
+                    <th>Close</th>
+                    <th>Volume</th>
+                </thead>
+                <tbody>
+                    {% for data in form %}
+                    <tr>
+                        <td><span class="editable">{{data.id}}</span></td>
+                        <td><span class="editable">{{data.date}}</span></td>
+                        <td><span class="editable">{{data.trade_code}}</span></td>
+                        <td><span class="editable">{{data.high}}</span></td>
+                        <td><span class="editable">{{data.low}}</span></td>
+                        <td><span class="editable">{{data.open}}</span></td>
+                        <td><span class="editable">{{data.close}}</span></td>
+                        <td><span class="editable">{{data.volume}}</span></td>
+                        <td>
+                            <button class="edit-button">Edit</button>
+                            <button class="save-button" style="display: none;">Save</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.edit-button').on('click', function () {
+            var row = $(this).closest('tr');
+            row.find('.editable').each(function () {
+                var content = $(this).text();
+                $(this).html('<input type="text" class="edit-field" value="' + content + '">');
+            });
+            row.find('.edit-button').hide();
+            row.find('.save-button').show();
+        });
+
+        $('.save-button').on('click', function () {
+        var row = $(this).closest('tr');
+        var data = {
+            
+            id: row.find('.editable:eq(0) input').val(),
+            date: row.find('.editable:eq(1) input').val(),
+            trade_code: row.find('.editable:eq(2) input').val(),
+            high: row.find('.editable:eq(3) input').val(),
+            low: row.find('.editable:eq(4) input').val(),
+            open: row.find('.editable:eq(5) input').val(),
+            close: row.find('.editable:eq(6) input').val(),
+            volume: row.find('.editable:eq(7) input').val(),
+            
+        };
+
+        var csrfToken = $('#editableTable input[name=csrfmiddlewaretoken]').val();
+
+        $.ajax({
+                method: 'POST',
+                url: '/update_data/',  
+                data: data,
+                dataType: 'json',
+
+                headers: {
+                'X-CSRFToken': csrfToken
+                },
+                
+                success: function (response) {
+                    
+                    row.find('.editable').each(function () {
+                        var inputVal = $(this).find('input').val();
+                        $(this).html(inputVal);
+                    });
+
+                    row.find('.edit-button').show();
+                    row.find('.save-button').hide();
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log(xhr.status + ": " + xhr.responseText);  
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock content %}
+
